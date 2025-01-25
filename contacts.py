@@ -19,9 +19,12 @@ class Name(Field):
 
 class Phone(Field):
     '''Клас для зберігання номера телефону.'''
-    def is_correct_number(self):
-        '''Валідація номера телефону, перевірка на 10 цифр'''
-        return len(self.value) == 10 and self.value.isdigit()
+    def __init__(self, phone_number):
+        # Валідація номера телефону, перевірка на 10 цифр
+        if len(phone_number) == 10 and phone_number.isdigit():
+            super().__init__(phone_number)
+        else:
+            raise ValueError("The phone number must contain only 10 digits.")
 
 
 class Record:
@@ -33,9 +36,8 @@ class Record:
 
     def add_phone(self, phone_number):
         '''Метод додавання номеру телефону'''
-        phone = Phone(phone_number)
-        if phone.is_correct_number() and self.find_phone(phone_number) is None:
-            self.phones.append(phone)
+        if self.find_phone(phone_number) is None:
+            self.phones.append(Phone(phone_number))
 
 
     def remove_phone(self, phone_number):
@@ -45,15 +47,11 @@ class Record:
 
     def edit_phone(self, old_number, new_number):
         '''Метод редагування номеру телефону'''
-        new_phone = Phone(new_number)
-        if new_phone.is_correct_number():
-            old_phone = self.find_phone(old_number)
-            if not old_phone is None:
-                old_phone.value = new_number
-            else:
-                raise ValueError(f"Phone number {old_number} not found!")
+        old_phone = self.find_phone(old_number)
+        if not old_phone is None:
+            old_phone.value = Phone(new_number).value
         else:
-            raise ValueError("The new phone number must contain 10 digits.")
+            raise ValueError(f"Phone number {old_number} not found!")
 
 
     def find_phone(self, phone_number):
